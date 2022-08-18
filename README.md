@@ -16,7 +16,8 @@ WebACL includes the following rules as COUNT mode:
 Run 
 
 ```
-cdk bootstrap
+npm install
+cdk bootstrap -c webaclName={Your WebACL name} 
 cdk deploy -c webaclName={Your WebACL name}  
 ```
 
@@ -27,5 +28,5 @@ Before removing the stack, you will need to disassociate the AWS resource from W
 Run
 
 ```
-cdk destroy
+cdk destroy -c webaclName={Your WebACL name}
 ```
