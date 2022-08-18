@@ -1,14 +1,31 @@
-# Welcome to your CDK TypeScript project
+# CDK example for AWS WAF
+This CDK template will deploy a WebACL that includes the baseline rule group of AWS manager rules and a rate-based rule as COUNT mode. Also, create CloudWatch logs for AWS WAF as the destination of AWS WAF logs.
 
-This is a blank project for CDK development with TypeScript.
+WebACL includes the following rules as COUNT mode:
+* [Core rule set (CRS) managed rule group](https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs)
+* [Known bad inputs managed rule group](https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs)
+* [Rate-based rule for All requests](https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-rate-based.html)
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
-## Useful commands
+## Prerequisites
+- AWS profile configured
+- AWS CDK installed [see here for instructions](https://docs.aws.amazon.com/cdk/latest/guide/home.html)
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+## How to deploy
+
+Run 
+
+```
+cdk bootstrap
+cdk deploy -c webaclName={Your WebACL name}  
+```
+
+##  Cleanup
+
+Before removing the stack, you will need to disassociate the AWS resource from WebACL manually.
+
+Run
+
+```
+cdk destroy
+```
