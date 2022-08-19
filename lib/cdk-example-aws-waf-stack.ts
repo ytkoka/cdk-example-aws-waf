@@ -2,6 +2,7 @@ import { Stack, StackProps, ArnFormat, RemovalPolicy } from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 import { CfnWebACL, CfnLoggingConfiguration } from 'aws-cdk-lib/aws-wafv2'
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'
+import { CfnInclude } from 'aws-cdk-lib/cloudformation-include'
 
 export class CdkExampleAwsWafStack extends Stack {
   constructor (scope: Construct, id: string, props?: StackProps) {
@@ -11,6 +12,7 @@ export class CdkExampleAwsWafStack extends Stack {
     if (webaclName == undefined) {
       throw new Error('Context value [webaclName] is not set')
     }
+    // Create WebACL
     const webacl = new CfnWebACL(this, 'MyCfnWebACL', {
       scope: 'CLOUDFRONT',
       defaultAction: { allow: {} },
@@ -105,13 +107,20 @@ export class CdkExampleAwsWafStack extends Stack {
         metricName: webaclName,
         sampledRequestsEnabled: true
       }
-    })
+    });
+    // Create CloudWatch Dashboard from CFn template
+    new CfnInclude(this, 'Template', {
+      templateFile: 'cw-waf-dashboard-cloudfront.yaml',
+      parameters: {
+        webaclName: webaclName
+      },
+    });
     // Create Log group
     const aclLogGroup = new LogGroup(this, 'webACLLogs', {
       logGroupName: `aws-waf-logs-${webaclName}`,
       retention: RetentionDays.SIX_MONTHS,
       removalPolicy: RemovalPolicy.DESTROY
-    })
+    });
     // Create logging configuration with log group as destination
     new CfnLoggingConfiguration(this, 'webAclLoggingConfiguration', {
       logDestinationConfigs: [
@@ -124,6 +133,6 @@ export class CdkExampleAwsWafStack extends Stack {
         })
       ],
       resourceArn: webacl.attrArn
-    })
+    });
   }
 }

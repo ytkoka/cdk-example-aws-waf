@@ -1,0 +1,167 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudWatch Dashboard for AWS WAF
+Parameters:
+    webaclName:
+        Description: Web ACL Name
+        Type: String
+Resources:
+    DashboardSideBySide:
+        Type: AWS::CloudWatch::Dashboard
+        Properties:
+            DashboardName: !Sub "WAF-Dashboard-Sample"
+            DashboardBody: !Sub |
+                {
+                    "widgets": [
+                        {
+                            "type": "metric",
+                            "height": 6,
+                            "width": 6,
+                            "x": 0,
+                            "y": 0,
+                            "properties": {
+                                "metrics": [
+                                    [ "AWS/WAFV2", "AllowedRequests", "WebACL", "${webaclName}", "Rule", "ALL", { "id": "m1" } ],
+                                    [ ".", "BlockedRequests", ".", ".", ".", ".", { "id": "m2" } ]
+                                ],
+                                "view": "timeSeries",
+                                "stacked": true,
+                                "region": "us-east-1",
+                                "stat": "Sum",
+                                "title": "Allowed vs Blocked Requests",
+                                "period": 300,
+                                "yAxis": {
+                                    "left": {
+                                        "showUnits": false
+                                    }
+                                }
+                            }
+                        },
+                                            {
+                            "type": "metric",
+                            "height": 6,
+                            "width": 6,
+                            "x": 6,
+                            "y": 0,
+                            "properties": {
+                                "metrics": [
+                                    [ "AWS/WAFV2", "CountedRequests", "WebACL", "${webaclName}", "Rule", "ALL" ]
+                                ],
+                                "view": "timeSeries",
+                                "stacked": true,
+                                "region": "us-east-1",
+                                "stat": "Sum",
+                                "title": "All Counted Requests",
+                                "period": 300,
+                                "yAxis": {
+                                    "left": {
+                                        "showUnits": false
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 6,
+                            "width": 6,
+                            "x": 12,
+                            "y": 0,
+                            "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields terminatingRuleId\n| stats count(*) as requestCount by terminatingRuleId\n| sort requestCount desc\n| limit 100",
+                                "region": "us-east-1",
+                                "title": "Top Terminating Rules",
+                                "view": "pie"
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 6,
+                            "width": 6,
+                            "x": 18,
+                            "y": 0,
+                            "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields httpRequest.clientIp\n| stats count(*) as requestCount by httpRequest.country\n| sort requestCount desc\n| limit 100",
+                                "region": "us-east-1",
+                                "title": "Top Countries",
+                                "view": "pie"
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 6,
+                            "width": 6,
+                            "x": 0,
+                            "y": 6,
+                            "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| parse @message /\\{\"name\":\"[Uu]ser\\-[Aa]gent\\\",\\\"value\\\"\\:\\\"(?<UserAgent>[^\"}]*)/\n| stats count(*) as requestCount by UserAgent\n| sort requestCount desc\n| limit 100",
+                                "region": "us-east-1",
+                                "title": "Top User-agents",
+                                "view": "table"
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 6,
+                            "width": 6,
+                            "x": 6,
+                            "y": 6,
+                            "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| filter @message like \"COUNT\"\n| stats count(*) as requestCount by httpRequest.uri\n| sort requestCount  desc\n| limit 100",
+                                "region": "us-east-1",
+                                "title": "Top Counted URIs",
+                                "view": "table"
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 6,
+                            "width": 6,
+                            "x": 12,
+                            "y": 6,
+                            "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| filter @message like /\"action\":\"BLOCK\"/\n| stats count(*) as requestCount by httpRequest.uri\n| sort requestCount  desc\n| limit 100",
+                                "region": "us-east-1",
+                                "title": "Top Blocked URIs",
+                                "view": "table"
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 6,
+                            "width": 6,
+                            "x": 18,
+                            "y": 6,
+                            "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| filter terminatingRuleType =\"RATE_BASED\" \n| sort @timestamp desc\n| display @timestamp, httpRequest.clientIp,httpRequest.uri, httpRequest.country, terminatingRuleId\n| limit 100",
+                                "region": "us-east-1",
+                                "title": " Blocked requests by Rate based rule",
+                                "view": "table"
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 8,
+                            "width": 12,
+                            "x": 0,
+                            "y": 12,
+                            "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| filter @message like \"COUNT\"\n| sort @timestamp desc\n| parse @message '\"nonTerminatingMatchingRules\":[{*}]' as nonTerminatingMatchingRules\n| parse @message '\"excludedRules\":[{*}]' as excludedRules\n| display @timestamp, httpRequest.clientIp,httpRequest.uri, httpRequest.country, excludedRules, nonTerminatingMatchingRules\n| limit 100",
+                                "region": "us-east-1",
+                                "title": "Counted Requests",
+                                "view": "table"
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 8,
+                            "width": 12,
+                            "x": 12,
+                            "y": 12,
+                            "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| filter @message like /\"action\":\"BLOCK\"/\n| sort @timestamp desc\n| display @timestamp, httpRequest.clientIp,httpRequest.uri, httpRequest.country, terminatingRuleId\n| limit 100",
+                                "region": "us-east-1",
+                                "title": "Blocked Requests",
+                                "view": "table"
+                            }
+                        }
+                    ]
+                }
