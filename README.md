@@ -6,6 +6,17 @@ WebACL includes the following rules set as COUNT mode:
 * [Known bad inputs managed rule group](https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs)
 * [Rate-based rule for All requests](https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-rate-based.html)
 
+CloudWatch dashboard is created by the [CloudFormation template](cw-waf-dashboard-cloudfront.yaml) in the CDK. the dashboard includes the following widgets:
+* Allowed vs Blocked Requests
+* All Counted Requests
+* Top Terminating Rules
+* Top Countries
+* Top User-agents
+* Blocked requests by Rate based rule (Require Rate-based rule)
+* Top Counted URIs
+* Top Blocked URIs
+* Counted Requests
+* Blocked Requests
 
 ## Prerequisites
 - AWS profile configured
