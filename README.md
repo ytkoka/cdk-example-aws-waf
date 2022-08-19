@@ -1,5 +1,5 @@
 # CDK example for AWS WAF
-This CDK template will deploy a WebACL that includes the baseline rule group of AWS managed rules and a rate-based rule. Also, create a CloudWatch logs group for AWS WAF as the destination of AWS WAF logs.
+This CDK template will deploy a WebACL that includes the baseline rule group of AWS managed rules and a rate-based rule. Also, create a CloudWatch logs group and CloudWatch dashboard for AWS WAF.
 
 WebACL includes the following rules set as COUNT mode:
 * [Core rule set (CRS) managed rule group](https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs)
