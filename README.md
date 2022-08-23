@@ -31,6 +31,7 @@ npm install
 cdk bootstrap -c webaclName={Your WebACL name} 
 cdk deploy -c webaclName={Your WebACL name}  
 ```
+This CDK template does not include the AWS resource to associate with WebACL. Please associate your AWS resource (CloudFront) to the WebACL created by this template. [see here for instructions](https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-associating-aws-resource.html)
 
 ##  Cleanup
 
