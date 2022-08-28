@@ -11,8 +11,8 @@ CloudWatch dashboard is created by the [CloudFormation template](cw-waf-dashboar
 * All Counted Requests
 * Top Terminating Rules
 * Top Countries
+* Top IP addresses
 * Top User-agents
-* Blocked requests by Rate based rule
 * Top Counted URIs
 * Top Blocked URIs
 * Counted Requests
