@@ -8,7 +8,7 @@ Resources:
     DashboardSideBySide:
         Type: AWS::CloudWatch::Dashboard
         Properties:
-            DashboardName: !Sub "WAF-Dashboard-Sample"
+            DashboardName: "WAF-Dashboard-Sample"
             DashboardBody: !Sub |
                 {
                     "widgets": [
@@ -92,6 +92,19 @@ Resources:
                             "x": 0,
                             "y": 6,
                             "properties": {
+                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields httpRequest.clientIp\n| stats count(*) as requestCount by httpRequest.clientIp\n| sort requestCount desc\n| limit 100",
+                                "region": "us-east-1",
+                                "title": "Top IP Addresses",
+                                "view": "table"
+                            }
+                        },
+                        {
+                            "type": "log",
+                            "height": 6,
+                            "width": 6,
+                            "x": 6,
+                            "y": 6,
+                            "properties": {
                                 "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| parse @message /\\{\"name\":\"[Uu]ser\\-[Aa]gent\\\",\\\"value\\\"\\:\\\"(?<UserAgent>[^\"}]*)/\n| stats count(*) as requestCount by UserAgent\n| sort requestCount desc\n| limit 100",
                                 "region": "us-east-1",
                                 "title": "Top User-agents",
@@ -102,7 +115,7 @@ Resources:
                             "type": "log",
                             "height": 6,
                             "width": 6,
-                            "x": 6,
+                            "x": 12,
                             "y": 6,
                             "properties": {
                                 "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| filter @message like \"COUNT\"\n| stats count(*) as requestCount by httpRequest.uri\n| sort requestCount  desc\n| limit 100",
@@ -115,25 +128,12 @@ Resources:
                             "type": "log",
                             "height": 6,
                             "width": 6,
-                            "x": 12,
+                            "x": 18,
                             "y": 6,
                             "properties": {
                                 "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| filter @message like /\"action\":\"BLOCK\"/\n| stats count(*) as requestCount by httpRequest.uri\n| sort requestCount  desc\n| limit 100",
                                 "region": "us-east-1",
                                 "title": "Top Blocked URIs",
-                                "view": "table"
-                            }
-                        },
-                        {
-                            "type": "log",
-                            "height": 6,
-                            "width": 6,
-                            "x": 18,
-                            "y": 6,
-                            "properties": {
-                                "query": "SOURCE 'aws-waf-logs-${webaclName}' | fields @timestamp, @message\n| filter terminatingRuleType =\"RATE_BASED\" \n| sort @timestamp desc\n| display @timestamp, httpRequest.clientIp,httpRequest.uri, httpRequest.country, terminatingRuleId\n| limit 100",
-                                "region": "us-east-1",
-                                "title": " Blocked requests by Rate based rule",
                                 "view": "table"
                             }
                         },
@@ -165,3 +165,4 @@ Resources:
                         }
                     ]
                 }
+                

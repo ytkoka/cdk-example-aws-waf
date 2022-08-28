@@ -121,6 +121,7 @@ export class CdkExampleAwsWafStack extends Stack {
       retention: RetentionDays.SIX_MONTHS,
       removalPolicy: RemovalPolicy.DESTROY
     });
+
     // Create logging configuration with log group as destination
     new CfnLoggingConfiguration(this, 'webAclLoggingConfiguration', {
       logDestinationConfigs: [
