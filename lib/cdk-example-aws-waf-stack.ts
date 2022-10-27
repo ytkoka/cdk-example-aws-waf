@@ -66,9 +66,11 @@ export class CdkExampleAwsWafStack extends Stack {
               vendorName: 'AWS',
               name: 'AWSManagedRulesKnownBadInputsRuleSet',
               excludedRules: [
-                { name: 'ExploitablePaths_URIPATH' },
                 { name: 'Host_localhost_HEADER' },
-                { name: 'Log4JRCE' },
+                { name: 'Log4JRCE_BODY' },
+                { name: 'Log4JRCE_URIPATH' },
+                { name: 'Log4JRCE_HEADER' },
+                { name: 'Log4JRCE_QUERYSTRING' },
                 { name: 'PROPFIND_METHOD' },
                 { name: 'ExploitablePaths_URIPATH' },
                 { name: 'JavaDeserializationRCE_BODY' },
